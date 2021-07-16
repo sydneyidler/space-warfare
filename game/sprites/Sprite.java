@@ -1,6 +1,7 @@
 package game.sprites;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 public class Sprite {
@@ -40,6 +41,10 @@ public class Sprite {
   public void setSpriteDimensions(int width, int height) {
     this._width = width;
     this._height = height;
+  }
+
+  public Rectangle getBounds() {
+    return new Rectangle(this._x, this._y, this._width, this._height);
   }
 
   public boolean isVisible() {

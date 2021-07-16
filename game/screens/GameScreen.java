@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -47,14 +48,16 @@ public class GameScreen extends JPanel implements ActionListener {
   private void doDrawing(Graphics g) {
     Graphics2D graphics2d = (Graphics2D) g;
 
-    graphics2d.drawImage(
-      this._spaceShip.getImage(),
-      this._spaceShip.getX(),
-      this._spaceShip.getY(),
-      this._spaceShip.getWidth(),
-      this._spaceShip.getHeight(),
-      this
-    );
+    if (this._spaceShip.isVisible()) {
+      graphics2d.drawImage(
+        this._spaceShip.getImage(),
+        this._spaceShip.getX(),
+        this._spaceShip.getY(),
+        this._spaceShip.getWidth(),
+        this._spaceShip.getHeight(),
+        this
+      );
+    }
 
     Missile[] missiles =  this._spaceShip.getMissiles();
     for (int i = 0; i < missiles.length; i++) {
@@ -102,6 +105,7 @@ public class GameScreen extends JPanel implements ActionListener {
     this.updateSpaceShip();
     this.updateMissiles();
     this.updateAliens();
+    this.checkCollision();
     this.repaint();
   }
   
@@ -121,6 +125,38 @@ public class GameScreen extends JPanel implements ActionListener {
   private void updateAliens() {
     for (int i = 0; i < this._aliens.length; i++) {
       this._aliens[i].move();
+    }
+  }
+
+  private void checkCollision() {
+    Rectangle spaceShipBounds = this._spaceShip.getBounds();
+
+    for (Alien alien : this._aliens) {
+      Rectangle alienBounds = alien.getBounds();
+      
+      if (alien.isVisible() && spaceShipBounds.intersects(alienBounds)) {
+        this._spaceShip.setVisible(false);
+        alien.setVisible(false);
+      }
+    }
+
+    Missile[] missiles = this._spaceShip.getMissiles();
+
+    for (Missile missile : missiles) {
+      Rectangle missileBounds = missile.getBounds();
+
+      if (!missile.isVisible()) {
+        continue;
+      }
+
+      for (Alien alien : this._aliens) {
+        Rectangle alienBounds = alien.getBounds();
+
+        if (alien.isVisible() && missileBounds.intersects(alienBounds)) {
+          missile.setVisible(false);
+          alien.setVisible(false);
+        }
+      }
     }
   }
 
